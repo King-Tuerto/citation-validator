@@ -483,13 +483,14 @@ def generate_html(results, output_path: Path, manifest_name: str):
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Figure Citation Report</title>
+<title>Graphics Manifest Checker — Figure Citation Report</title>
 <style>
   body {{ font-family: 'Segoe UI', Arial, sans-serif; background: #f4f6f8; margin: 0; padding: 0; color: #222; }}
   .toolbar {{ background: #2c3e50; color: white; padding: 14px 28px; display: flex; align-items: center; gap: 16px; }}
   .toolbar h1 {{ margin: 0; font-size: 1.2rem; flex: 1; }}
   .btn {{ padding: 8px 18px; border: none; border-radius: 5px; font-size: 0.9rem; cursor: pointer; font-weight: bold; }}
   .btn-pdf {{ background: #e74c3c; color: white; }}
+  .btn-word {{ background: #1a73e8; color: white; }}
   .container {{ max-width: 960px; margin: 28px auto; padding: 0 20px; }}
   .summary {{ display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }}
   .stat-box {{ flex: 1; min-width: 140px; background: white; border-radius: 8px; padding: 16px 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.1); text-align: center; }}
@@ -521,9 +522,80 @@ def generate_html(results, output_path: Path, manifest_name: str):
 <body>
 
 <div class="toolbar">
-  <h1>📊 Figure Citation Report — {manifest_name}</h1>
+  <h1>📊 Graphics Manifest Checker — {manifest_name}</h1>
   <button class="btn btn-pdf" onclick="window.print()">🖨️ Save as PDF</button>
+  <button class="btn btn-word" onclick="saveWord()">📝 Save as Word</button>
 </div>
+
+<script>
+function saveWord() {{
+    var docName = "{manifest_name}".replace(/[.][^/.]+$/, "");
+    var cards = document.querySelectorAll('.card');
+    var content = '<html><head><meta charset="UTF-8"></head><body>';
+    content += '<h1>Graphics Manifest Checker — Figure Citation Report</h1>';
+    content += '<p><b>Source:</b> {manifest_name} &nbsp;&nbsp; <b>Generated:</b> {datetime.now().strftime('%B %d, %Y at %I:%M %p')}</p>';
+    content += '<p><b>Total Figures:</b> {len(results)} &nbsp;|&nbsp; ';
+    content += '<b style="color:#922">Need Citations: {cite_count}</b> &nbsp;|&nbsp; ';
+    content += '<b style="color:#276">Original — No Citation: {original_count}</b></p><hr>';
+
+    cards.forEach(function(card) {{
+        var figNum   = card.querySelector('.fig-num')   ? card.querySelector('.fig-num').innerText   : '';
+        var figTitle = card.querySelector('.fig-title') ? card.querySelector('.fig-title').innerText : '';
+        var badge    = card.querySelector('.badge')     ? card.querySelector('.badge').innerText     : '';
+        var apaBlock = card.querySelector('.apa-block') ? card.querySelector('.apa-block').innerText : '';
+        var noteText = card.querySelector('.note-text') ? card.querySelector('.note-text').innerText : '';
+        var filename = card.querySelector('.filename')  ? card.querySelector('.filename').innerText  : '';
+        var fwLabel  = card.querySelector('.framework-label') ? card.querySelector('.framework-label').innerText : '';
+
+        var isCite  = badge.indexOf('Citation Required') !== -1;
+        var headBg  = isCite ? '#F8D7DA' : '#D4EDDA';
+        var badgeBg = isCite ? '#F8D7DA' : '#D4EDDA';
+
+        // Heading row: fig number on left, colored badge cell on right
+        content += '<table width="100%" cellpadding="6" cellspacing="0" style="margin-bottom:4px;border:none;">';
+        content += '<tr>';
+        content += '<td style="background:white;border:none;"><b>' + figNum + ' — ' + figTitle + '</b></td>';
+        content += '<td width="160" align="center" style="background:' + badgeBg + ';border:1px solid #ccc;border-radius:4px;font-weight:bold;font-size:0.85em;">' + badge + '</td>';
+        content += '</tr></table>';
+
+        if (filename) {{
+            content += '<p style="font-size:0.85em;color:#888;margin:2px 0 8px;">' + filename + '</p>';
+        }}
+        if (fwLabel) {{
+            content += '<p>' + fwLabel + '</p>';
+        }}
+        if (apaBlock) {{
+            content += '<p style="background:#f0f4ff;border-left:4px solid #3a7bd5;padding:8px 12px;"><b>APA Citation:</b><br>' + apaBlock + '</p>';
+        }}
+        if (noteText) {{
+            content += '<p style="font-size:0.9em;color:#555;">' + noteText + '</p>';
+        }}
+        content += '<hr>';
+    }});
+
+    // Append deduplicated APA reference list from the bottom section
+    var apaItems = document.querySelectorAll('.apa-list-section ol li');
+    if (apaItems.length > 0) {{
+        content += '<h2>APA Reference List (Citations Required)</h2>';
+        content += '<p style="font-size:0.85em;color:#666;">Copy and paste these into your reference list. Figures sharing the same source are listed only once.</p>';
+        content += '<ol>';
+        apaItems.forEach(function(li) {{ content += '<li>' + li.innerText + '</li>'; }});
+        content += '</ol>';
+    }}
+
+    content += '</body></html>';
+
+    var blob = new Blob([content], {{ type: 'application/msword' }});
+    var url  = URL.createObjectURL(blob);
+    var a    = document.createElement('a');
+    a.href     = url;
+    a.download = docName + '_figure_citations.doc';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}}
+</script>
 
 <div class="container">
   <p class="meta">Generated: {datetime.now().strftime('%B %d, %Y at %I:%M %p')} &nbsp;|&nbsp; Source: {manifest_name}</p>

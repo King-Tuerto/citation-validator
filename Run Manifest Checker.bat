@@ -1,10 +1,10 @@
 @echo off
-title Manifest Citation Checker
+title Graphics Manifest Checker
 cls
 
 echo.
 echo ================================================
-echo         FIGURE / MANIFEST CITATION CHECKER
+echo        GRAPHICS MANIFEST CHECKER
 echo ================================================
 echo.
 
@@ -39,9 +39,10 @@ py "C:\Users\Paul\Desktop\Claude Projects\Citation-Checker\manifest_checker.py" 
 
 echo.
 echo ================================================
-echo Done! An HTML report has been saved next to
+echo Done! Two files have been saved next to
 echo your MANIFEST.md file:
-echo   - [manifest_name]_figure_citations.html
+echo   - [manifest_name]_figure_citations.html  (open in browser)
+echo   - Use "Save as Word" button inside the HTML for a .doc copy
 echo ================================================
 echo.
 echo ------------------------------------------------
