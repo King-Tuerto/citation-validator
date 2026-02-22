@@ -1,0 +1,25 @@
+# Never upload the API key to GitHub
+.env
+
+# Python cache files - not needed on GitHub
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+
+# Output files - these are generated each time, no need to store them
+*.html
+*.docx
+*.doc
+*.pdf
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# OS clutter
+.DS_Store
+Thumbs.db
+desktop.ini
