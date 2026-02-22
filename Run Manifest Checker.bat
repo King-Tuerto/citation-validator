@@ -1,23 +1,22 @@
 @echo off
-title Citation Checker
+title Manifest Citation Checker
 cls
 
 echo.
 echo ================================================
-echo            CITATION CHECKER
+echo         FIGURE / MANIFEST CITATION CHECKER
 echo ================================================
 echo.
 
 :loop
 
-echo Drag and drop your document onto this window,
-echo OR type/paste the full path to your document below.
+echo Drag and drop your MANIFEST.md file onto this window,
+echo OR type/paste the full path to your MANIFEST.md below.
 echo.
-echo Supported file types: .pdf  .docx  .md
 echo Type EXIT to quit.
 echo.
 set DOCPATH=
-set /p DOCPATH="Drop file here or type path: "
+set /p DOCPATH="Drop MANIFEST.md here or type path: "
 
 REM Remove quotes if user dragged and dropped (Windows adds them)
 set DOCPATH=%DOCPATH:"=%
@@ -33,23 +32,21 @@ if "%DOCPATH%"=="" (
 )
 
 echo.
-echo Checking citations in: %DOCPATH%
-echo This may take 1-2 minutes depending on how many citations...
+echo Checking figures in: %DOCPATH%
 echo.
 
-py "C:\Users\Paul\Desktop\Claude Projects\Citation-Checker\main.py" "%DOCPATH%"
+py "C:\Users\Paul\Desktop\Claude Projects\Citation-Checker\manifest_checker.py" "%DOCPATH%"
 
 echo.
 echo ================================================
-echo Done! Check the folder where your document lives
-echo for two new files:
-echo   - [filename]_citations.html   (open in Firefox)
-echo   - [filename]_with_urls.docx   (open in Word)
+echo Done! An HTML report has been saved next to
+echo your MANIFEST.md file:
+echo   - [manifest_name]_figure_citations.html
 echo ================================================
 echo.
 echo ------------------------------------------------
-echo Check another document? Drop the next file in
-echo below, or type EXIT to close.
+echo Check another manifest? Drop it below,
+echo or type EXIT to close.
 echo ------------------------------------------------
 echo.
 goto loop
